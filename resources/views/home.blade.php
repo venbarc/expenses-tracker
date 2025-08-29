@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     
     {{-- head --}}
@@ -6,14 +7,24 @@
 
     <body class="antialiased" id="main-bg">
 
-        <nav class="navbar navbar-expand-lg shadow-sm py-lg-5 py-4 bg-dark">
-            <div class="container-fluid px-lg-5 px-3 d-flex justify-content-between align-items-center">
-                <a class="navbar-brand fw-bold text-light" href="#">ExpensesTracker</a>
-                <a class="btn btn-outline-light ms-lg-3" href="#">Login</a>
+        <x-navbar />
+
+        <!-- Offcanvas Side Form -->
+        <x-side-form />
+
+        <!-- Empty State -->
+        <div id="emptyState" class="card shadow-sm border-dashed h-100 d-flex align-items-center justify-content-center mt-5 width-50" style="cursor:pointer;" data-bs-toggle="offcanvas" data-bs-target="#addExpenseOffcanvas" aria-controls="addExpenseOffcanvas">
+            <div class="card-body text-center">
+                <div class="display-1 text-muted">+</div>
+                <h5 class="card-title mt-3">Add Your First Expense</h5>
+                <p class="text-muted">Click here to start tracking your expenses</p>
             </div>
-        </nav>
+        </div>
 
+        <!-- Expenses Container (initially hidden) -->
+        <div id="expensesContainer" class="row d-none"></div>
 
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

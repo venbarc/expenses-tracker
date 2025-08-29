@@ -4,3 +4,21 @@
 #main-bg{
     background: #202020;
 }
+
+.offcanvas-end {
+    width: 400px; /* wider for better UI */
+}
+
+.offcanvas-header {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+/* Smooth slide transition */
+.offcanvas.offcanvas-end {
+  transition: transform 0.4s ease-in-out, opacity 0.3s ease-in-out;
+}

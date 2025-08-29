@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
+// AUTH 
+Route::middleware(['auth'])->group(function () {
+   
+});
+
+// NOT AUTH 
+// HOME 
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::prefix('guest')->name('guest.')->group(function () {
+    Route::prefix('createActivity')->name('createActivity.')->group(function () {
+        
+    });
 });
