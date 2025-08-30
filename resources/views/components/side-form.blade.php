@@ -7,8 +7,9 @@
         <form id="expenseForm">
             <!-- Date -->
             <div class="mb-3">
-                <label for="date" class="form-label">Date</label>
-                <input type="date" id="date" class="form-control">
+                <label for="expenseDate" class="form-label">Date</label>
+                <input type="date" id="expenseDate" class="form-control">
+                <div class="invalid-feedback">Date is required.</div>
             </div>
 
             <!-- Category -->
@@ -24,6 +25,7 @@
                     <option>Healthcare</option>
                     <option>Others</option>
                 </select>
+                <div class="invalid-feedback">Category is required.</div>
             </div>
 
             <!-- Payment Method -->
@@ -32,12 +34,20 @@
                 <select class="form-select" id="expensePayment">
                     <option selected disabled>Choose method...</option>
                     <option>Cash</option>
+                    <option>E-Wallet</option>
                     <option>Credit Card</option>
                     <option>Debit Card</option>
-                    <option>E-Wallet</option>
                     <option>Bank Transfer</option>
                     <option>Others</option>
                 </select>
+                <div class="invalid-feedback">Payment method is required.</div>
+            </div>
+
+            <!-- Amount -->
+            <div class="mb-3">
+                <label for="expenseAmount" class="form-label">Amount</label>
+                <input type="number" class="form-control" id="expenseAmount" placeholder="Enter amount">
+                <div class="invalid-feedback">Amount is required.</div>
             </div>
 
             <!-- Tags -->
@@ -46,16 +56,11 @@
                 <input type="text" class="form-control" id="expenseTags" placeholder="e.g. lunch, groceries, utilities">
             </div>
 
-            <!-- Amount -->
-            <div class="mb-3">
-                <label for="expenseAmount" class="form-label">Amount</label>
-                <input type="number" class="form-control" id="expenseAmount" placeholder="Enter amount">
-            </div>
-
             <!-- Notes -->
             <div class="mb-3">
                 <label for="expenseNote" class="form-label">Note</label>
                 <textarea class="form-control" id="expenseNote" rows="3" placeholder="Optional note..."></textarea>
+                <small id="noteCounter" class="text-muted">0/35</small>
             </div>
 
             <!-- Submit -->

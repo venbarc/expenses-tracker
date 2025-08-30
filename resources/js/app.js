@@ -1,9 +1,12 @@
 import './bootstrap';
+import { enforceMaxLength } from './helper';
+import { formatDate } from './helper';
+import { formatAmount } from './helper';
 
 document.addEventListener("DOMContentLoaded", function() {
     // Default date to today (YYYY-MM-DD)
     (function setToday() {
-        const el = document.getElementById('date');
+        const el = document.getElementById('expenseDate');
         if (!el) return;
 
         const today = new Date();
@@ -13,73 +16,162 @@ document.addEventListener("DOMContentLoaded", function() {
         el.value = `${yyyy}-${mm}-${dd}`;
     })();
 
-    const form = document.getElementById("expenseForm");
-    const container = document.getElementById("expensesContainer");
-    const emptyState = document.getElementById("emptyState"); // This now refers to your card
+    const expenseForm = document.getElementById("expenseForm");
+    const expensesContainer = document.getElementById("expensesContainer");
+    const emptyStateInitCard = document.getElementById("emptyStateInitCard"); 
     const offcanvasEl = document.getElementById("addExpenseOffcanvas");
     
     const offcanvas = offcanvasEl ? new bootstrap.Offcanvas(offcanvasEl) : null;
 
-    if (form) {
-        form.addEventListener("submit", function(e) {
-            e.preventDefault();
+    // SUBMIT FORM
+    expenseForm.addEventListener("submit", function(e) {
+        e.preventDefault();
 
-            const newExpense = {
-                date: document.getElementById("date").value,
-                category: document.getElementById("expenseCategory").value,
-                payment: document.getElementById("expensePayment").value,
-                tags: document.getElementById("expenseTags").value,
-                amount: document.getElementById("expenseAmount").value,
-                note: document.getElementById("expenseNote").value,
-            };
+        const dateInput = document.getElementById("expenseDate");
+        const categoryInput = document.getElementById("expenseCategory");
+        const paymentInput = document.getElementById("expensePayment");
+        const amountInput = document.getElementById("expenseAmount");
+        const tagsInput = document.getElementById("expenseTags");
+        const noteInput = document.getElementById("expenseNote");
 
-            let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-            expenses.push(newExpense);
-            localStorage.setItem("expenses", JSON.stringify(expenses));
+        let isValid = true;
 
-            loadExpenses();
-            form.reset();
-            
-            if (offcanvas) {
-                offcanvas.hide();
-            }
+        // Reset previous validation states
+        [dateInput, categoryInput, paymentInput, amountInput].forEach(input => {
+            input.classList.remove("is-invalid");
         });
-    }
 
+        // Validation
+        if (!dateInput.value) {
+            dateInput.classList.add("is-invalid");
+            isValid = false;
+        } 
+        if (!categoryInput.value || categoryInput.selectedIndex === 0) {
+            categoryInput.classList.add("is-invalid");
+            isValid = false;
+        }
+        if (!paymentInput.value || paymentInput.selectedIndex === 0) {
+            paymentInput.classList.add("is-invalid");
+            isValid = false;
+        }
+        if (!amountInput.value || amountInput.selectedIndex === 0) {
+            amountInput.classList.add("is-invalid");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            return; // Stop here if validation fails
+        }
+
+        const newExpense = {
+            date: dateInput.value,
+            category: categoryInput.value,
+            payment: paymentInput.value,
+            amount: amountInput.value,
+            tags: tagsInput.value,
+            note: noteInput.value,
+        };
+
+        let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+        expenses.push(newExpense);
+        localStorage.setItem("expenses", JSON.stringify(expenses));
+
+        loadExpenses();
+
+        // Clear everything except the date
+        categoryInput.value = "Choose category...";
+        paymentInput.value = "Choose method...";
+        tagsInput.value = "";
+        amountInput.value = "";
+        noteInput.value = "";
+
+        if (offcanvas) {
+            offcanvas.hide();
+        }
+    });
+
+
+    // LOAD UI 
     function loadExpenses() {
-        if (!container) return;
+        if (!expensesContainer) return;
     
-        container.innerHTML = "";
+        expensesContainer.innerHTML = "";
         let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
 
         if (expenses.length === 0) {
-            if (emptyState) emptyState.classList.remove("d-none");
-            if (container) container.classList.add("d-none");
+            if (emptyStateInitCard) emptyStateInitCard.classList.remove("d-none");
+            if (expensesContainer) expensesContainer.classList.add("d-none");
             return;
         }
 
-        if (emptyState) emptyState.classList.add("d-none");
-        if (container) container.classList.remove("d-none");
+        if (emptyStateInitCard) emptyStateInitCard.classList.add("d-none");
+        if (expensesContainer) expensesContainer.classList.remove("d-none");
 
         expenses.forEach(exp => {
             const col = document.createElement("div");
-            col.className = "col-12 col-md-6 col-lg-3 mb-3";
+
+            const formattedDate = formatDate(exp.date);
+            const formattedAmount = formatAmount(exp.amount);
+
+            col.className = "col-12 col-md-6 col-lg-3 mb-3 fade-in";
             col.innerHTML = `
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-body">
-                        <h6 class="text-muted small">${exp.date}</h6>
-                        <h5 class="fw-bold">${exp.category}</h5>
-                        <p class="mb-1"><strong>Payment:</strong> ${exp.payment}</p>
-                        <p class="mb-1"><strong>Tags:</strong> ${exp.tags || '-'}</p>
-                        <p class="mb-1"><strong>Amount:</strong> ₱${exp.amount}</p>
-                        <p class="text-muted small">${exp.note || ''}</p>
+                <div class="card shadow-sm border-0 rounded-3 h-100">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center mb-3">
+                            <div class="col-6">
+                                <span class="badge bg-primary bg-gradient text-white px-3 py-2 fs-6 rounded-pill">
+                                <i class="bi bi-tag me-1"></i> ${exp.category}
+                                </span>
+                                <div class="text-muted small mt-2">
+                                <i class="bi bi-calendar-event me-1"></i> ${formattedDate}
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <h4 class="fw-bold text-success mb-1">${formattedAmount}</h4>
+                                <div class="text-dark small">
+                                <i class="bi bi-credit-card me-1 text-secondary"></i>
+                                <strong>${exp.payment}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        ${exp.note 
+                        ? `<div class="alert alert-light border-start border-3 border-primary py-2 px-3 small mb-0">
+                                <i class="bi bi-stickies me-2"></i>${exp.note}
+                            </div>` 
+                        :  `<div class="alert alert-light border-start border-3 border-secondary py-2 px-3 small mb-0">
+                                <i class="bi bi-stickies me-2"></i>---
+                            </div>` 
+                        }
                     </div>
                 </div>
             `;
-            container.appendChild(col);
+            expensesContainer.appendChild(col);
+        });
+
+    }
+
+    // LIMITER USER REQUEST
+    ["expenseDate", "expenseCategory", "expensePayment", "expenseTags", "expenseAmount", "expenseNote"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) enforceMaxLength(el, 80);
+    });
+
+    // NOTE COUNTER UI
+    const noteInput = document.getElementById("expenseNote");
+    const noteCounter = document.getElementById("noteCounter");
+
+    if (noteInput && noteCounter) {
+        noteInput.addEventListener("input", function () {
+            let length = this.value.length;
+            if (length > 35) {
+                this.value = this.value.substring(0, 35);
+                length = 35;
+            }
+            noteCounter.textContent = `${length}/35`;
         });
     }
 
-    // Load expenses on initial page load
+    // LOAD ON INITIAL PAGE
     loadExpenses();
 });
+
