@@ -5,15 +5,15 @@
     {{-- head --}}
     <x-app.head />
 
-    <body class="antialiased" id="main-bg">
+    <body class="d-flex flex-column min-vh-100" id="main-bg">
 
         <x-navbar />
 
-        <section class="mx-lg-5 mx-3">
+        <main class="flex-grow-1 mx-lg-5 mx-3">
             <!-- Offcanvas Side Form -->
             <x-side-form />
 
-            <!-- Empty State -->
+            <!-- Empty State initial Card-->
             <div id="emptyStateInitCard" class="card shadow-sm border-dashed h-100 d-flex align-items-center justify-content-center mt-5 width-50" style="cursor:pointer;" data-bs-toggle="offcanvas" data-bs-target="#addExpenseOffcanvas" aria-controls="addExpenseOffcanvas">
                 <div class="card-body text-center">
                     <div class="display-1 text-muted">+</div>
@@ -24,12 +24,11 @@
 
             <!-- Expenses Container (initially hidden) -->
             <div id="expensesContainer" class="row d-none mt-5"></div>
-        </section>
+        </main>
 
-        {{-- bootstrap js --}}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Add SweetAlert2 CDN in your HTML -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <x-footer />
+
+        <x-cdn-scripts />
+
     </body>
 </html>
