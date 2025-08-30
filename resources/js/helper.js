@@ -1,6 +1,5 @@
-
 // max length input in form
-export function enforceMaxLength(input, max = 80) {
+export function enforceMaxLength(input, max = 35) {
     input.addEventListener("input", function () {
         if (this.value.length > max) {
             this.value = this.value.substring(0, max);
@@ -27,4 +26,30 @@ export function formatAmount(amount) {
         style: 'currency', 
         currency: 'PHP' 
     }).format(amount);
+}
+
+// Swal alert DELETE confirmation 
+export function confirmDelete(callback) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won’t be able to recover this expense!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "Cancel"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            callback(); // Execute the function passed in
+
+            Swal.fire({
+                title: "Deleted!",
+                text: "The expense has been deleted.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    });
 }

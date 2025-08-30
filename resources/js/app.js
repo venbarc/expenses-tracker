@@ -2,6 +2,8 @@ import './bootstrap';
 import { enforceMaxLength } from './helper';
 import { formatDate } from './helper';
 import { formatAmount } from './helper';
+import { confirmDelete } from "./helper.js";
+
 
 document.addEventListener("DOMContentLoaded", function() {
     // Default date to today (YYYY-MM-DD)
@@ -91,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
 
-    // LOAD UI 
+    // LOAD UI CARD 
     function loadExpenses() {
         if (!expensesContainer) return;
     
@@ -107,7 +109,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (emptyStateInitCard) emptyStateInitCard.classList.add("d-none");
         if (expensesContainer) expensesContainer.classList.remove("d-none");
 
-        expenses.forEach(exp => {
+        expenses.slice().reverse().forEach((exp, idx) => {
+
             const col = document.createElement("div");
 
             const formattedDate = formatDate(exp.date);
@@ -115,45 +118,72 @@ document.addEventListener("DOMContentLoaded", function() {
 
             col.className = "col-12 col-md-6 col-lg-3 mb-3 fade-in";
             col.innerHTML = `
-                <div class="card shadow-sm border-0 rounded-3 h-100">
+                <div class="card shadow-sm border-0 rounded-3 h-100" data-index="${expenses.length - 1 - idx}">
                     <div class="card-body p-3">
                         <div class="row align-items-center mb-3">
                             <div class="col-6">
                                 <span class="badge bg-primary bg-gradient text-white px-3 py-2 fs-6 rounded-pill">
-                                <i class="bi bi-tag me-1"></i> ${exp.category}
+                                    <i class="bi bi-tag me-1"></i> ${exp.category}
                                 </span>
                                 <div class="text-muted small mt-2">
-                                <i class="bi bi-calendar-event me-1"></i> ${formattedDate}
+                                    <i class="bi bi-calendar-event me-1"></i> ${formattedDate}
                                 </div>
                             </div>
                             <div class="col-6 text-end">
                                 <h4 class="fw-bold text-success mb-1">${formattedAmount}</h4>
                                 <div class="text-dark small">
-                                <i class="bi bi-credit-card me-1 text-secondary"></i>
-                                <strong>${exp.payment}</strong>
+                                    <i class="bi bi-credit-card me-1 text-secondary"></i>
+                                    <strong>${exp.payment}</strong>
                                 </div>
                             </div>
                         </div>
+
                         ${exp.note 
-                        ? `<div class="alert alert-light border-start border-3 border-primary py-2 px-3 small mb-0">
+                        ? `<div class="alert alert-light border-start border-3 border-primary py-2 px-3 small mb-2">
                                 <i class="bi bi-stickies me-2"></i>${exp.note}
                             </div>` 
-                        :  `<div class="alert alert-light border-start border-3 border-secondary py-2 px-3 small mb-0">
+                        : `<div class="alert alert-light border-start border-3 border-secondary py-2 px-3 small mb-2">
                                 <i class="bi bi-stickies me-2"></i>---
                             </div>` 
                         }
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary w-50 edit-expense">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger w-50 delete-expense">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
+
             `;
             expensesContainer.appendChild(col);
         });
-
     }
+
+    // DELETE 
+    document.addEventListener("click", function (e) {
+        if (e.target.closest(".delete-expense")) 
+        {
+            const card = e.target.closest(".card");
+            const index = card.getAttribute("data-index");
+
+            confirmDelete(() => {
+                let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+                expenses.splice(index, 1); // remove item
+                localStorage.setItem("expenses", JSON.stringify(expenses));
+                loadExpenses();
+            });
+        }
+    });
+
 
     // LIMITER USER REQUEST
     ["expenseDate", "expenseCategory", "expensePayment", "expenseTags", "expenseAmount", "expenseNote"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) enforceMaxLength(el, 80);
+        const elementId = document.getElementById(id);
+        if (elementId) enforceMaxLength(elementId, 35);
     });
 
     // NOTE COUNTER UI
